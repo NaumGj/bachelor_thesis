@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en" ng-app ="IoTVisual">
+<head>
+	<meta charset="utf-8">
+	<title>Trgovina PRPO</title>
+	<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.css">
+
+	<!-- Angular Material requires Angular.js Libraries -->
+	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-animate.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-aria.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-messages.min.js"></script>
+
+	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-route.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-resource.js"></script>
+
+	<!-- Angular Material Library -->
+	<script src="http://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.js"></script>
+	
+	<!-- d3js Visualization Library -->
+	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+
+	<!-- Icons -->
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+	<link data-require="bootstrap-css@*" data-semver="3.3.1" rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" />
+    <script data-require="ui-bootstrap@*" data-semver="0.12.1" src="http://angular-ui.github.io/bootstrap/ui-bootstrap-tpls-0.12.1.min.js"></script>
+
+	<script src="app.js"></script>
+	<script src="services.js"></script>
+    <style>
+    .md-sidenav-left .md-theme-indigo, .md-sidenav-left .nav-theme {
+        background-color: #285f95;
+    }
+    .md-toolbar-tools {
+        background-color: #285f95;
+    }
+    </style>
+</head>
+<body>
+
+	<div ng-controller="AppCtrl" layout="column" style="min-height:100%" ng-cloak>
+		<section layout="row" flex>
+
+			<!-- left navigation START -->
+			<md-sidenav class="md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="$mdMedia('gt-md')">
+				<md-toolbar class="md-theme-indigo">
+					<div align="center">
+						<img src="http://icons.iconarchive.com/icons/martz90/circle-addon2/128/computer-icon.png" />
+					</div>
+					<h1 class="md-toolbar-tools">
+						Visualizations
+					</h1>
+				</md-toolbar>
+				<md-content layout-padding>	
+					<md-menu-item>
+						<md-button ng-href="#!/">Home</md-button>
+					</md-menu-item>
+					<md-menu-item>
+						<md-button ng-href="#!/counters">Counters</md-button>
+					</md-menu-item>
+				</md-content>
+			</md-sidenav>
+			<!-- left navigation END -->
+
+			<!-- main START -->
+			<md-content flex layout-fill>
+				<!-- title toolbar START -->
+				<md-toolbar>
+					<div class="md-toolbar-tools">
+						<md-button ng-click="toggleLeft()" class="md-icon-button md-button md-ink-ripple" hide-gt-md>
+							 <i class="material-icons">menu</i>
+						</md-button>
+						<h2 class="md-flex">Visualizations</h2>
+					</div>
+				</md-toolbar>
+				
+				<div layout="column" layout-padding layout-align="top center">
+					
+					<div ng-view></div>
+
+				</div>
+
+				<div flex></div>
+			</md-content>
+			<!-- main END -->
+
+		</section>
+	</div>
+
+</body>
+</html>
