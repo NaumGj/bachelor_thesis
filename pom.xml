@@ -11,12 +11,13 @@
   	<module>module-models</module>
   	<module>module-cep</module>
   	<module>module-utils</module>
+  	<module>module-webservices-cep</module>
   </modules>
   
-  <properties>
+  	<properties>
 		<kumuluzee.version>2.1.0-beta.1</kumuluzee.version>
 	</properties>
-
+	
 	<dependencyManagement>
 		<dependencies>
 	        <dependency>
@@ -28,11 +29,6 @@
 	            <groupId>com.google.guava</groupId>
 	            <artifactId>guava</artifactId>
 	            <version>19.0</version>
-	        </dependency>
-	        <dependency>
-	            <groupId>org.hdrhistogram</groupId>
-	            <artifactId>HdrHistogram</artifactId>
-	            <version>2.1.8</version>
 	        </dependency>
 	        <dependency>
 	            <groupId>com.fasterxml.jackson.core</groupId>
@@ -59,6 +55,11 @@
 				<artifactId>module-models</artifactId>
 				<version>0.0.1-SNAPSHOT</version>
 			</dependency>
+			<dependency>
+			<groupId>si.fri.diploma</groupId>
+			<artifactId>module-cep</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 			<dependency>
                 <groupId>org.apache.curator</groupId>
                 <artifactId>curator-framework</artifactId>

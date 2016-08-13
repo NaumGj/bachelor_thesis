@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Initialized;
 import javax.enterprise.event.Observes;
@@ -35,60 +36,73 @@ public class Producer {
 	
 	private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 	
+	private ScheduledFuture<?> runnableHandle;
+	
     public void init( @Observes @Initialized( ApplicationScoped.class ) Object init ) {
         initTimer();
     }
     
+    @PreDestroy
+    public void unregisterService() {
+    	LOG.log(Level.INFO, "Destroying scheduled handle and shutting down scheduler...");
+    	try {
+    		if(!runnableHandle.isCancelled()) {
+    			runnableHandle.cancel(true);
+    		}
+    		if(!scheduler.isShutdown()) {
+    			scheduler.shutdown();
+    		}
+    	} catch (Exception e) {
+    		LOG.log(Level.WARNING, "Exception while destroying scheduled handle and shutting down scheduler!");
+    	}
+    }
+    
     private class MyRunnable implements Runnable{
 
-        private Integer numberOfEvents;
-
-        public MyRunnable(Integer numberOfEvents){
-        	this.numberOfEvents = numberOfEvents;
-        }
-
+        public MyRunnable() {}
 
         public void run() {
-            LOG.log(Level.INFO, "configuring...");
+            LOG.log(Level.INFO, "Setting up the Kafka producer...");
             
-         // set up the producer
+            // set up the producer
             KafkaProducer<String, String> producer = null;
             try (InputStream props = Resources.getResource("producer.props").openStream()) {
                 Properties properties = new Properties();
                 properties.load(props);
                 producer = new KafkaProducer<>(properties);
             } catch (IOException e) {
-//    			e.printStackTrace();
-            	System.out.println("IO Exception!");
+            	LOG.log(Level.SEVERE, "IO Exception during the set up of the Kafka producer!");
     		}
 
-            LOG.log(Level.INFO, "starting production of events");
+            LOG.log(Level.INFO, "The Kafka producer is starting production of events");
             try {
-                for (int i = 0; i < this.numberOfEvents; i++) {
-                	Thread.sleep(50);
+                for (int i = 0; i < Integer.MAX_VALUE; i++) {
+//                	busyWait();
+//                	Thread.sleep(1);
 //                	System.out.println(i);
                     // send lots of messages
                 	producer.send(new ProducerRecord<String, String>(
                             "fast-messages", i % 6, null,
-                            String.format("{\"type\":\"test\", \"t\":%.3f, \"k\":%d}", System.nanoTime() * 1e-9, i)));
+                            String.format("{\"type\":\"normal\", \"timestamp\":%.5f, \"serial_num\":%d}", System.currentTimeMillis() * 1e-3, i)));
 //                    producer.send(new ProducerRecord<String, String>(
 //                            "fast-messages",
 //                            String.format("{\"type\":\"test\", \"t\":%.3f, \"k\":%d}", System.nanoTime() * 1e-9, i)));
 //                    System.out.println(i);
-                    // every so often send to a different topic
                     if (i % 1000 == 0) {
                         producer.send(new ProducerRecord<String, String>(
                                 "fast-messages",
-                                String.format("{\"type\":\"marker\", \"t\":%.3f, \"k\":%d}", System.nanoTime() * 1e-9, i)));
+                                String.format("{\"type\":\"marker\", \"timestamp\":%.5f, \"serial_num\":%d}", System.currentTimeMillis() * 1e-3, i)));
 //                        producer.send(new ProducerRecord<String, String>(
 //                                "summary-markers",
 //                                String.format("{\"type\":\"other\", \"t\":%.3f, \"k\":%d}", System.nanoTime() * 1e-9, i)));
                         producer.flush();
-                        System.out.println("Sent msg number " + i);
+                        if (i % 10000 == 0) {
+                        	LOG.log(Level.INFO, "Sent msg number " + i);
+                        }
                     }
                 }
-            } catch (Throwable throwable) {
-                System.out.printf("%s", throwable.getStackTrace());
+            } catch (Exception e) {
+            	LOG.log(Level.SEVERE, "Exception in Kafka producer while sending events! Reason: " + e.getMessage());
             } finally {
                 producer.close();
             }
@@ -96,10 +110,20 @@ public class Producer {
     }
 
     public void initTimer() {
-    	MyRunnable runnable = new MyRunnable(100000000);
+    	LOG.log(Level.INFO, "Scheduling the Kafka producer...");
+    	MyRunnable runnable = new MyRunnable();
 
-        //use the handle if you need to cancel scheduler or something else
-        final ScheduledFuture<?> runnableHandle = scheduler.schedule(runnable, 5, TimeUnit.SECONDS);
+        runnableHandle = scheduler.schedule(runnable, 5, TimeUnit.SECONDS);
+    }
+    
+    public void busyWait(){
+        final long INTERVAL = 1000;
+        long start = System.nanoTime();
+        long end = 0;
+        do {
+            end = System.nanoTime();
+        } while(start + INTERVAL >= end);
+//        System.out.println(end - start);
     }
 
 }

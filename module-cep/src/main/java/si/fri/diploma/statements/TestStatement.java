@@ -8,9 +8,16 @@ public class TestStatement {
     private EPStatement statement;
 
     public TestStatement(EPAdministrator admin) {
-        String stmt = "select k, count(*) as cnt from TestEvent.win:time_batch(10 sec)";
-
-        statement = admin.createEPL(stmt);
+//        String stmt = "select count(*) as cnt from TestEvent.win:time(10 sec)";
+//
+//        statement = admin.createEPL(stmt);
+        
+        String ctx = "create context CtxSeconds initiated @now and pattern [every timer:interval(10)] terminated after 10 sec";
+    	statement = admin.createEPL(ctx);
+    	
+    	String stmt = "context CtxSeconds select count(*) as cnt" +
+					" from TestEvent output snapshot when terminated";
+    	statement = admin.createEPL(stmt);
     }
 
     public void addListener(UpdateListener listener)

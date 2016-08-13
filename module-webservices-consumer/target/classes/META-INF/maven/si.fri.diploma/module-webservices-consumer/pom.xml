@@ -36,6 +36,11 @@
 			<groupId>si.fri.diploma</groupId>
 			<artifactId>module-models</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.thetransactioncompany</groupId>
+			<artifactId>cors-filter</artifactId>
+			<version>2.5</version>
+		</dependency>
 	</dependencies>
 
 	<build>

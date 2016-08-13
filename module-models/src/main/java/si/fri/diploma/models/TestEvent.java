@@ -2,7 +2,6 @@ package si.fri.diploma.models;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -11,20 +10,22 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Generated("org.jsonschema2pojo")
 @JsonPropertyOrder({
 	"type",
-	"t",
-	"k"
+	"timestamp",
+	"serial_num",
+	"timestamp_consumed"
 })
 public class TestEvent {
 
 	@JsonProperty("type")
 	private String type;
-	@JsonProperty("t")
-	private String t;
-	@JsonProperty("k")
-	private String k;
+	@JsonProperty("timestamp")
+	private Long timestamp;
+	@JsonProperty("serial_num")
+	private Integer serial_num;
+	@JsonProperty("timestamp_consumed")
+	private Long timestamp_consumed;
 	@JsonIgnore
 	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 	
@@ -53,41 +54,61 @@ public class TestEvent {
 	/**
 	 *
 	 * @return
-	 * The t
+	 * The timestamp
 	 */
-	@JsonProperty("t")
-	public String getT() {
-		return t;
+	@JsonProperty("timestamp")
+	public Long getTimestamp() {
+		return timestamp;
 	}
 
 	/**
 	 *
-	 * @param t
-	 * The t
+	 * @param timestamp
+	 * The timestamp
 	 */
-	@JsonProperty("t")
-	public void setT(String t) {
-		this.t = t;
+	@JsonProperty("timestamp")
+	public void setTimestamp(Long timestamp) {
+		this.timestamp = timestamp;
 	}
 
 	/**
 	 *
 	 * @return
-	 * The k
+	 * The serial_num
 	 */
-	@JsonProperty("k")
-	public String getK() {
-		return k;
+	@JsonProperty("serial_num")
+	public Integer getSerialNum() {
+		return serial_num;
 	}
 
 	/**
 	 *
-	 * @param k
-	 * The k
+	 * @param serial_num
+	 * The serial_num
 	 */
-	@JsonProperty("k")
-	public void setK(String k) {
-		this.k = k;
+	@JsonProperty("serial_num")
+	public void setSerialNum(Integer serial_num) {
+		this.serial_num = serial_num;
+	}
+	
+	/**
+	 *
+	 * @return
+	 * The timestamp_consumed
+	 */
+	@JsonProperty("timestamp_consumed")
+	public Long getTimestampConsumed() {
+		return timestamp_consumed;
+	}
+
+	/**
+	 *
+	 * @param timestamp_consumed
+	 * The timestamp_consumed
+	 */
+	@JsonProperty("timestamp_consumed")
+	public void setTimestampConsumed(Long timestamp_consumed) {
+		this.timestamp_consumed = timestamp_consumed;
 	}
 
 	@JsonAnyGetter
