@@ -86,40 +86,51 @@ app = angular.module('IoTVisual', ['ngRoute', 'ngAnimate','ngMaterial','ngResour
 		{hour: 9,sales: 55},
 		{hour: 10,sales: 30}
 	]; */
-	var hour = 1;
-	$scope.salesData=[{hour: hour,sales: 0}];
-	$scope.countData=[{hour: hour,sales: 0}];
+	var index = 0;
+	$scope.latencyData = [{index: index, value: 0}];
+	$scope.countData = [{index: index, value: 0}];
 
 	$interval(function(){
-		hour=hour+1;
-		//var sales= Math.round(Math.random() * 100);
-		Counter.get().$promise.then(function(count) {
-			console.log(count);
-			if(count.counts) {
-				$scope.count = count.counts;
-				if($scope.countData.length > 30) {
-					$scope.countData.shift();
-				}
-				//console.log("Pushing latency!");
-				//console.log(hour);
-				console.log($scope.countData);
-				$scope.countData.push({hour: hour, sales: count.counts});
+		Counter.query().$promise.then(function(counts) {
+			console.log(counts);
+			// console.log(count[0]);
+			if(counts.length > 0) {
+				$scope.count = counts[counts.length - 1].counts;
+			} else {
+				$scope.count = 0;
 			}
-			
-			//console.log(izdelek[izdelek.length-1]);
-			//$scope.salesData.push({hour: hour, sales:izdelek[izdelek.length-1]});
+			$scope.countData = [];
+			index = 0;
+			counts.forEach(function(count) {
+				// console.log(latency);
+				$scope.countData.push({index: index, value: count.counts});
+				index = index + 1;
+			});
 		});
-		Latency.get().$promise.then(function(latency) {
-			console.log(latency);
-			if(latency.fifteen) {
+		Latency.query().$promise.then(function(avgLatencies) {
+			console.log(avgLatencies);
+			// console.log(latency[0]);
+			if(avgLatencies.length > 0) {
+				$scope.latency = parseFloat(Math.round(avgLatencies[avgLatencies.length - 1].ten * 100) / 100).toFixed(3);
+			} else {
+				$scope.latency = 0;
+			}
+			$scope.latencyData = [];
+			index = 0;
+			avgLatencies.forEach(function(latency) {
+				// console.log(latency);
+				$scope.latencyData.push({index: index, value: latency.ten});
+				index = index + 1;
+			});
+			/* if(latency.ten) {
 				if($scope.salesData.length > 30) {
 					$scope.salesData.shift();
 				}
 				//console.log("Pushing latency!");
 				//console.log(hour);
 				console.log($scope.salesData);
-				$scope.salesData.push({hour: hour, sales: latency.fifteen});
-			}
+				$scope.salesData.push({hour: hour, sales: latency.ten});
+			} */
 		});
 	}, 2000, 0);
 
@@ -131,7 +142,7 @@ app = angular.module('IoTVisual', ['ngRoute', 'ngAnimate','ngMaterial','ngResour
 	   link: function(scope, elem, attrs){
 		   var exp = $parse(attrs.chartData);
 
-           var salesDataToPlot=exp(scope);
+           var dataToPlot=exp(scope);
            var padding = 20;
            var pathClass="path";
            var xScale, yScale, xAxisGen, yAxisGen, lineFun;
@@ -141,26 +152,26 @@ app = angular.module('IoTVisual', ['ngRoute', 'ngAnimate','ngMaterial','ngResour
            var svg = d3.select(rawSvg[0]);
 
            scope.$watchCollection(exp, function(newVal, oldVal){
-               salesDataToPlot=newVal;
+               dataToPlot=newVal;
                redrawLineChart();
            });
 
            function setChartParameters(){
 
                xScale = d3.scale.linear()
-                   .domain([salesDataToPlot[0].hour, salesDataToPlot[salesDataToPlot.length-1].hour])
-                   .range([padding + 5, rawSvg.attr("width") - padding]);
+                   .domain([0, dataToPlot.length-1])
+                   .range([padding + 50, rawSvg.attr("width") - padding]);
 
                yScale = d3.scale.linear()
-                   .domain([0, d3.max(salesDataToPlot, function (d) {
-                       return d.sales;
+                   .domain([0, d3.max(dataToPlot, function (d) {
+                       return d.value;
                    })])
                    .range([rawSvg.attr("height") - padding, 0]);
 
                xAxisGen = d3.svg.axis()
                    .scale(xScale)
                    .orient("bottom")
-                   .ticks(salesDataToPlot.length - 1);
+                   .ticks(0);
 
                yAxisGen = d3.svg.axis()
                    .scale(yScale)
@@ -169,10 +180,10 @@ app = angular.module('IoTVisual', ['ngRoute', 'ngAnimate','ngMaterial','ngResour
 
                lineFun = d3.svg.line()
                    .x(function (d) {
-                       return xScale(d.hour);
+                       return xScale(d.index);
                    })
                    .y(function (d) {
-                       return yScale(d.sales);
+                       return yScale(d.value);
                    })
                    .interpolate("basis");
            }
@@ -188,12 +199,12 @@ app = angular.module('IoTVisual', ['ngRoute', 'ngAnimate','ngMaterial','ngResour
 
 			   svg.append("svg:g")
 				   .attr("class", "y axis")
-				   .attr("transform", "translate(25,0)")
+				   .attr("transform", "translate(65,0)")
 				   .call(yAxisGen);
 
 			   svg.append("svg:path")
 				   .attr({
-					   d: lineFun(salesDataToPlot),
+					   d: lineFun(dataToPlot),
 					   "stroke": "blue",
 					   "stroke-width": 2,
 					   "fill": "none",
@@ -211,7 +222,7 @@ app = angular.module('IoTVisual', ['ngRoute', 'ngAnimate','ngMaterial','ngResour
 
 			   svg.selectAll("."+pathClass)
 				   .attr({
-					   d: lineFun(salesDataToPlot)
+					   d: lineFun(dataToPlot)
 				   });
 		   }
 

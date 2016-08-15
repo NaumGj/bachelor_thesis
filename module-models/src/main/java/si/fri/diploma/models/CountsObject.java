@@ -16,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 public class CountsObject {
 
 	@JsonProperty("counts")
-	private Integer counts;
+	private Long counts;
 	@JsonIgnore
 	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 	
@@ -28,7 +28,7 @@ public class CountsObject {
 	 * The fifteen seconds latency
 	 */
 	@JsonProperty("counts")
-	public Integer getCounts() {
+	public Long getCounts() {
 		return counts;
 	}
 
@@ -38,7 +38,7 @@ public class CountsObject {
 	 * The fifteen seconds latency
 	 */
 	@JsonProperty("fifteen")
-	public void setCounts(Integer counts) {
+	public void setCounts(Long counts) {
 		this.counts = counts;
 	}
 

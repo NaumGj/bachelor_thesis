@@ -1,6 +1,5 @@
 package si.fri.diploma.restservices.v1.resources;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.enterprise.context.RequestScoped;
@@ -12,7 +11,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import si.fri.diploma.listeners.TestListener;
+import si.fri.diploma.listeners.CountListener;
 import si.fri.diploma.models.CountsObject;
 
 @RequestScoped
@@ -22,21 +21,14 @@ import si.fri.diploma.models.CountsObject;
 public class RestServiceCounts {
 
 	@Inject
-    private TestListener countsListener;
+    private CountListener countsListener;
 
     @GET
     public Response getCounts(){
 
-    	CountsObject counts = countsListener.getCounts();
-//        System.out.println("COUNTS ARRAY: " + counts.toString());
-//        System.out.println("COUNTS SIZE: " + counts.size());
+    	List<CountsObject> counts = countsListener.getCounts();
     	
-//    	List<Integer> counts = new ArrayList<Integer>();
-//    	counts.add(1);
-//    	counts.add(2);
-
         return Response.ok().entity(counts).build();
-
     }
 	
 }

@@ -1,18 +1,15 @@
 package si.fri.diploma.adapter;
 
 
+import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Initialized;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.InvocationCallback;
 import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.GenericEntity;
-import javax.ws.rs.core.GenericType;
-import javax.ws.rs.core.Response;
 
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
@@ -26,17 +23,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import si.fri.diploma.ServiceRegistry;
 import si.fri.diploma.listeners.LatencyListener;
-import si.fri.diploma.listeners.TestListener;
-import si.fri.diploma.models.TestEvent;
+import si.fri.diploma.listeners.CountListener;
+import si.fri.diploma.models.IoTEvent;
 import si.fri.diploma.statements.LatencyStatement;
-import si.fri.diploma.statements.TestStatement;
+import si.fri.diploma.statements.CountStatement;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -60,6 +55,8 @@ public class RestAdapter {
 	
 	private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 	
+	private ScheduledFuture<?> runnableHandle;
+	
 	private EPServiceProvider epService; 
 	
     public void init( @Observes @Initialized( ApplicationScoped.class ) Object init ) {
@@ -67,6 +64,24 @@ public class RestAdapter {
     	initEsper();
     	LOG.log(Level.INFO, "Initializing timer");
         initTimer();
+    }
+    
+    /**
+     * Destroy runnable handle and scheduler.
+     */
+    @PreDestroy
+    public void destroyScheduler() {
+    	LOG.log(Level.INFO, "Destroying scheduled handle and shutting down scheduler...");
+    	try {
+    		if(!runnableHandle.isCancelled()) {
+    			runnableHandle.cancel(true);
+    		}
+    		if(!scheduler.isShutdown()) {
+    			scheduler.shutdown();
+    		}
+    	} catch (Exception e) {
+    		LOG.log(Level.WARNING, "Exception while destroying scheduled handle and shutting down scheduler!");
+    	}
     }
     
     private class AdapterRunnable implements Runnable {
@@ -86,6 +101,7 @@ public class RestAdapter {
     		LOG.log(Level.INFO, "Up and running!");
 //        	LOG.log(Level.INFO, services.discoverServiceURI("consumer").toString());
     		List<String> uris = services.discoverServiceURI("consumer");
+    		
 //    		this.itemsService = client.target("http://10.16.0.6:");
 //			System.out.println("URI: " + this.itemsService.getUri());
 //			
@@ -95,6 +111,7 @@ public class RestAdapter {
 //            LOG.log(Level.INFO, "Answer: " + output);
 //            List<TestEvent> events = response.readEntity(new GenericType<List<TestEvent>>() {});
 //            System.out.println(events);
+    		
     		for(String uri : uris) {
     			try {
     				String url = "http://" + services.getUrl("consumer", uri) + ":8080/events";
@@ -107,9 +124,9 @@ public class RestAdapter {
     					public void completed(String answer) {
     						// on complete
 //    						LOG.log(Level.INFO, "ANSWER: " + answer);
-    						List<TestEvent> events = null;
+    						List<IoTEvent> events = null;
     						try {
-    							events = Arrays.asList(mapper.readValue(answer, TestEvent[].class));
+    							events = Arrays.asList(mapper.readValue(answer, IoTEvent[].class));
     						} catch (JsonParseException e) {
     							LOG.log(Level.WARNING, "JsonParseException in async request. Reason: " + e.getMessage());
     						} catch (JsonMappingException e) {
@@ -118,8 +135,8 @@ public class RestAdapter {
     							LOG.log(Level.WARNING, "IOException in async request. Reason: " + e.getMessage());
     						}
 //    						LOG.log(Level.INFO, "The list of events: " + events.toString());
-    						for(TestEvent event : events) {
-    							if(Integer.parseInt(event.getSerialNum()) % 1000 == 0) {
+    						for(IoTEvent event : events) {
+    							if("marker".equals(event.getType())) {
     								LOG.log(Level.INFO, "ID: " + event.getSerialNum());
     							}
 //    	                       	System.out.println("Sending " + event.getK());
@@ -153,21 +170,21 @@ public class RestAdapter {
     	LOG.log(Level.INFO, "Scheduling the CEP adapter to poll events...");
         AdapterRunnable runnable = new AdapterRunnable();
 
-        final ScheduledFuture<?> runnableHandle = scheduler.scheduleAtFixedRate(runnable, 5000, 500, TimeUnit.MILLISECONDS);
+        runnableHandle = scheduler.scheduleAtFixedRate(runnable, 5000, 500, TimeUnit.MILLISECONDS);
     }
     
     public void initEsper() {
     	// Configure engine with event names to make the statements more readable.
         // This could also be done in a configuration file.
         Configuration configuration = new Configuration();
-        configuration.addEventType("TestEvent", TestEvent.class.getName());
+        configuration.addEventType("TestEvent", IoTEvent.class.getName());
 
         // Get engine instance
         epService = EPServiceProviderManager.getProvider("RestAdapter", configuration);
         
         // Set up statements
-        TestStatement testStmt = new TestStatement(epService.getEPAdministrator());
-        testStmt.addListener(new TestListener());
+        CountStatement testStmt = new CountStatement(epService.getEPAdministrator());
+        testStmt.addListener(new CountListener());
         
         LatencyStatement latencyStmt = new LatencyStatement(epService.getEPAdministrator());
         latencyStmt.addListener(new LatencyListener());

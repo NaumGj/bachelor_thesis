@@ -56,10 +56,10 @@
 				<version>0.0.1-SNAPSHOT</version>
 			</dependency>
 			<dependency>
-			<groupId>si.fri.diploma</groupId>
-			<artifactId>module-cep</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
+				<groupId>si.fri.diploma</groupId>
+				<artifactId>module-cep</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
+			</dependency>
 			<dependency>
                 <groupId>org.apache.curator</groupId>
                 <artifactId>curator-framework</artifactId>

@@ -12,7 +12,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import si.fri.diploma.Consumer;
-import si.fri.diploma.models.TestEvent;
+import si.fri.diploma.models.IoTEvent;
 
 @RequestScoped
 @Path("events")
@@ -23,14 +23,12 @@ public class RestServiceEvents {
 	@Inject
     private Consumer eventsConsumer;
 
-
     @GET
     public Response getEvents(){
 
-        List<TestEvent> events = eventsConsumer.getAndRemoveEvents();
+        List<IoTEvent> events = eventsConsumer.getAndRemoveEvents();
 
         return Response.ok().entity(events).build();
-
     }
 	
 }

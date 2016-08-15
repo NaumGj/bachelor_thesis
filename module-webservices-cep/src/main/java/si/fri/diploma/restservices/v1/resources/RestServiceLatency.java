@@ -1,5 +1,7 @@
 package si.fri.diploma.restservices.v1.resources;
 
+import java.util.List;
+
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -24,9 +26,7 @@ public class RestServiceLatency {
     @GET
     public Response getLatency(){
 
-        LatencyObject latency = latencyListener.getLastAvgLatency();
-//        System.out.println("COUNTS ARRAY: " + counts.toString());
-//        System.out.println("COUNTS SIZE: " + counts.size());
+        List<LatencyObject> latency = latencyListener.getAvgLatencies();
     	
         return Response.ok().entity(latency).build();
     }

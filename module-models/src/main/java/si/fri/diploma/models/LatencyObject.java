@@ -11,12 +11,12 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-	"fifteen"
+	"ten"
 })
 public class LatencyObject {
 
-	@JsonProperty("fifteen")
-	private Double fifteen;
+	@JsonProperty("ten")
+	private Double ten;
 	@JsonIgnore
 	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 	
@@ -25,21 +25,21 @@ public class LatencyObject {
 	/**
 	 *
 	 * @return
-	 * The fifteen seconds latency
+	 * The ten seconds latency
 	 */
-	@JsonProperty("fifteen")
-	public Double getFifteen() {
-		return fifteen;
+	@JsonProperty("ten")
+	public Double getTen() {
+		return ten;
 	}
 
 	/**
 	 *
-	 * @param fifteen seconds latency
-	 * The fifteen seconds latency
+	 * @param ten seconds latency
+	 * The ten seconds latency
 	 */
-	@JsonProperty("fifteen")
-	public void setFifteen(Double fifteen) {
-		this.fifteen = fifteen;
+	@JsonProperty("ten")
+	public void setTen(Double ten) {
+		this.ten = ten;
 	}
 
 	@JsonAnyGetter
