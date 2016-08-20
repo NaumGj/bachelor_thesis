@@ -27,32 +27,32 @@ public class LatencyListener implements UpdateListener {
             return; // ignore old events for events leaving the window
         }
 
-        EventBean theEvent = newEvents[0];
-
-        if(theEvent != null) {
-//        	if(theEvent.get("avgLatency") != null) {
-//        		log.info("ID: " + theEvent.get("serialNum").toString());
-//        		log.info("avgLatency=" + theEvent.get("avgLatency").toString());
-//        	}
-        	if(theEvent.get("avgLatency") != null) {
-        		boolean canReadLatency = true;
-        		Double avgLatency = null;
-        		try {
-	        		avgLatency = (Double)theEvent.get("avgLatency");
-	        		avgLatency *= 1e-3;	//convert to seconds
-        		} catch(Exception e) {
-        			LOG.log(Level.WARNING, "Cannot cast the average latency to Double.");
-            		canReadLatency = false;
-            	}
-        		if(canReadLatency) {
-        			LatencyObject latency = new LatencyObject();
-	        		latency.setTen(avgLatency);
-	        		avgLatencies.addLast(latency);
-	        		while (avgLatencies.size() > LIST_SIZE) {
-	        			avgLatencies.removeFirst();
-		        	}
-        		}
-        	}
+        for (EventBean theEvent : newEvents) {
+	        if(theEvent != null) {
+//        		if(theEvent.get("avgLatency") != null) {
+//        			log.info("ID: " + theEvent.get("serialNum").toString());
+//        			log.info("avgLatency=" + theEvent.get("avgLatency").toString());
+//        		}
+	        	if(theEvent.get("avgLatency") != null) {
+	        		boolean canReadLatency = true;
+	        		Double avgLatency = null;
+	        		try {
+		        		avgLatency = (Double)theEvent.get("avgLatency");
+		        		avgLatency *= 1e-3;	//convert to seconds
+	        		} catch(Exception e) {
+	        			LOG.log(Level.WARNING, "Cannot cast the average latency to Double.");
+	            		canReadLatency = false;
+	            	}
+	        		if(canReadLatency) {
+	        			LatencyObject latency = new LatencyObject();
+		        		latency.setTen(avgLatency);
+		        		avgLatencies.addLast(latency);
+		        		while (avgLatencies.size() > LIST_SIZE) {
+		        			avgLatencies.removeFirst();
+			        	}
+	        		}
+	        	}
+	        }
         }
     }
 

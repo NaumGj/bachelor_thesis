@@ -10,7 +10,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 
-import si.fri.diploma.models.IoTEvent;
+import si.fri.diploma.models.SimpleEvent;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,7 +49,7 @@ public class Consumer {
 	
 	private ScheduledFuture<?> runnableHandle;
 	
-	private ArrayList<IoTEvent> consumedEvents = new ArrayList<IoTEvent>();
+	private ArrayList<SimpleEvent> consumedEvents = new ArrayList<SimpleEvent>();
 	
 	/**
 	 * Initialize consumption of events.
@@ -143,39 +143,32 @@ public class Consumer {
                         	try {
                         		msg = mapper.readTree(record.value());
                         	} catch (JsonProcessingException e) {
-                        		LOG.log(Level.SEVERE, "JSONProcessingException while reading the record value");
+                        		LOG.log(Level.SEVERE, "JsonProcessingException while reading the record value");
                         	} catch (IOException e) {
                         		LOG.log(Level.SEVERE, "IO Exception while reading the record value");
                         	}
-                        	
-                        	IoTEvent event = null;
-							try {
-								event = mapper.treeToValue(msg, IoTEvent.class);
-							} catch (JsonProcessingException e) {
-								LOG.log(Level.WARNING, "JsonProcessingException in consumer. Reason: " + e.getMessage());
-							}
+//                        	LOG.log(Level.INFO, msg.toString());
+//                        	LOG.log(Level.INFO, msg.get("type").asText());
+                        	SimpleEvent event = null;
+                        	try {
+    							event = mapper.treeToValue(msg, SimpleEvent.class);
+    							LOG.log(Level.INFO, mapper.writeValueAsString(event));
+    						} catch (JsonProcessingException e) {
+    							LOG.log(Level.WARNING, "JsonProcessingException in consumer. Reason: " + e.getMessage());
+    						}
 							
 							if(event != null) {
                             	event.setTimestampConsumed(System.currentTimeMillis());
-                            	consumedEvents.add(event);
+                            	
+                            	if("marker".equals(event.getType())) {
+    								LOG.log(Level.INFO, "Received message number " + event.getSerialNum());
+    							} 
+   								consumedEvents.add(event);
                     		}
                         	
-                            switch (event.getType()) {
-                                case "normal":
-//	                                if(Double.parseDouble(event.getTimestampConsumed()) < Double.parseDouble(event.getTimestamp())) {
-//	                                	LOG.log(Level.WARNING, "Consumed: " + event.getTimestampConsumed() + "\nProduced:" + event.getTimestamp());
-//	                                }
-//	                               	LOG.log(Level.INFO, "Partition ID: " + msg.get("serial_num").asInt() % 6);
-                                    break;
-                                case "marker":
-                                	LOG.log(Level.INFO, "Received message number " + event.getSerialNum());
-                                    break;
-                                default:
-                                    throw new IllegalArgumentException("Illegal message type: " + msg.get("type"));
-                            }
-	                            break;
+	                        break;
                         default:
-                        	throw new IllegalStateException("Shouldn't be possible to get message on topic " + record.topic());
+                        	throw new IllegalStateException("It's not possible to get message on topic " + record.topic());
                     }
                 }
             }
@@ -186,8 +179,8 @@ public class Consumer {
      * Return events to the CEP adapter through REST services and delete the events array.
      * @return List of consumed of events since last call of this function
      */
-    public List<IoTEvent> getAndRemoveEvents() {
-    	ArrayList<IoTEvent> eventsCopy = new ArrayList<>(consumedEvents);
+    public List<SimpleEvent> getAndRemoveEvents() {
+    	ArrayList<SimpleEvent> eventsCopy = new ArrayList<>(consumedEvents);
     	consumedEvents.clear();
     	return eventsCopy;
     }

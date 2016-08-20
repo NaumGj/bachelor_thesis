@@ -1,0 +1,9 @@
+si\fri\diploma\adapter\RestAdapter$AdapterRunnable$1.class
+si\fri\diploma\adapter\RestAdapter.class
+si\fri\diploma\statements\LatencyStatement.class
+si\fri\diploma\statements\CountStatement.class
+si\fri\diploma\adapter\RestAdapter$AdapterRunnable.class
+si\fri\diploma\listeners\CountListener.class
+si\fri\diploma\listeners\LatencyListener.class
+si\fri\diploma\statements\FireDetectionStatement.class
+si\fri\diploma\listeners\FireDetectionListener.class

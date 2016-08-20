@@ -2,7 +2,7 @@
 <html lang="en" ng-app ="IoTVisual">
 <head>
 	<meta charset="utf-8">
-	<title>Visualization of IoT stream</title>
+	<title>IoT</title>
 	<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.css">
 
 	<!-- Angular Material requires Angular.js Libraries -->
@@ -19,6 +19,8 @@
 	
 	<!-- d3js Visualization Library -->
 	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+	
+	<script src="http://ngmaterial.assets.s3.amazonaws.com/svg-assets-cache.js"></script>
 
 	<!-- Icons -->
 	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -46,10 +48,10 @@
 			<md-sidenav class="md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="$mdMedia('gt-md')">
 				<md-toolbar class="md-theme-indigo">
 					<div align="center">
-						<img src="http://icons.iconarchive.com/icons/martz90/circle-addon2/128/computer-icon.png" />
+						<img src="http://icons.iconarchive.com/icons/mahm0udwally/all-flat/256/Computer-icon.png" />
 					</div>
 					<h1 class="md-toolbar-tools">
-						Visualizations
+						Internet of Things
 					</h1>
 				</md-toolbar>
 				<md-content layout-padding>	
@@ -57,7 +59,13 @@
 						<md-button ng-href="#!/">Home</md-button>
 					</md-menu-item>
 					<md-menu-item>
-						<md-button ng-href="#!/counters">Statistics</md-button>
+						<md-button ng-href="#!/counters">Kafka throughput</md-button>
+					</md-menu-item>
+					<md-menu-item>
+						<md-button ng-href="#!/fire">Send fire events</md-button>
+					</md-menu-item>
+					<md-menu-item>
+						<md-button ng-href="#!/shoplifting">Shoplifting scenario</md-button>
 					</md-menu-item>
 				</md-content>
 			</md-sidenav>
@@ -71,11 +79,11 @@
 						<md-button ng-click="toggleLeft()" class="md-icon-button md-button md-ink-ripple" hide-gt-md>
 							 <i class="material-icons">menu</i>
 						</md-button>
-						<h2 class="md-flex">Visualizations</h2>
+						<h2 class="md-flex">Internet of Things</h2>
 					</div>
 				</md-toolbar>
 				
-				<div layout="column" layout-padding layout-align="top center">
+				<div>
 					
 					<div ng-view></div>
 

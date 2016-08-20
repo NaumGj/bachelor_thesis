@@ -1,0 +1,65 @@
+<div layout="column" layout-padding layout-align="top center">
+	<h4>Send an event where a product is removed from the shelf</h4>
+	<form>
+		  <div>
+			  <md-input-container>
+				<label>Product ID</label>
+				<input ng-model="shelf.product_id">
+			  </md-input-container>
+		  </div>
+		<div>
+			<section layout="row" layout-sm="column" layout-align="center center" layout-wrap>
+				<md-button class="md-raised md-primary" ng-click="sendShelfEvent(shelf)" ng-disabled="sendShelfEventCheck()==false">Send " product removed from shelf" event</md-button>
+			</section>
+		</div>
+	</form>
+
+	<h4>Send an event where a product is paid</h4>
+	<form>
+		  <div>
+			  <md-input-container>
+				<label>Product ID</label>
+				<input ng-model="paid.product_id">
+			  </md-input-container>
+		  </div>
+		<div>
+			<section layout="row" layout-sm="column" layout-align="center center" layout-wrap>
+				<md-button class="md-raised md-primary" ng-click="sendPaidEvent(paid)" ng-disabled="sendPaidEventCheck()==false">Send "product paid" event</md-button>
+			</section>
+		</div>
+	</form>
+
+	<h4>Send an event where a product is carried out of the shop</h4>
+	<form>
+		  <div>
+			  <md-input-container>
+				<label>Product ID</label>
+				<input ng-model="exit.product_id">
+			  </md-input-container>
+		  </div>
+		<div>
+			<section layout="row" layout-sm="column" layout-align="center center" layout-wrap>
+				<md-button class="md-raised md-primary" ng-click="sendExitEvent(exit)" ng-disabled="sendExitEventCheck()==false">Send "product carried out of shop" event</md-button>
+			</section>
+		</div>
+	</form>
+</div>
+
+<div layout="column" layout-padding layout-align="top center">
+	<h4>Stolen products</h4>
+	<p ng-show="stolen.length == 0">There are no stolen products.</p>
+</div>
+<md-grid-list md-cols="3" md-gutter="3em" md-row-height="4:3">
+	<md-grid-tile ng-repeat="product in stolen">
+		<md-card>
+			<div style="width:75px" layout-align="top center">
+				<img ng-src="https://image.freepik.com/free-icon/warning-signal_318-34168.jpg" class="md-card-image" alt="Washed Out">
+			</div>
+			<md-card-title>
+				<md-card-title-text>
+					<span class="md-headline">Product with id {{product.product_id}} is stolen!</span>
+				</md-card-title-text>
+			</md-card-title>
+		</md-card>
+	</md-grid-tile>
+</md-grid-list>

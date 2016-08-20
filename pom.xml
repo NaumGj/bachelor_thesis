@@ -12,6 +12,10 @@
   	<module>module-cep</module>
   	<module>module-utils</module>
   	<module>module-webservices-cep</module>
+  	<module>module-fire-producer</module>
+  	<module>module-webservices-producer</module>
+  	<module>module-shop-producer</module>
+  	<module>module-webservices-shop-producer</module>
   </modules>
   
   	<properties>
@@ -43,6 +47,16 @@
 			<dependency>
 				<groupId>si.fri.diploma</groupId>
 				<artifactId>module-consumer</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId>si.fri.diploma</groupId>
+				<artifactId>module-fire-producer</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId>si.fri.diploma</groupId>
+				<artifactId>module-shop-producer</artifactId>
 				<version>0.0.1-SNAPSHOT</version>
 			</dependency>
 			<dependency>

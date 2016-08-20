@@ -1,7 +1,6 @@
 package si.fri.diploma.listeners;
 
 import java.util.LinkedList;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -24,21 +23,19 @@ public class CountListener implements UpdateListener {
             return; // ignore old events for events leaving the window
         }
 
-        // CHECK IF newEvents ARRAY ALWAYS HAS 1 ELEMENT
-        LOG.log(Level.INFO, "LENGTH: " + newEvents.length);
-        EventBean theEvent = newEvents[0];
-
-//        log.info("count=" + theEvent.get("cnt").toString());
-        if(theEvent != null) {
-        	Long cnt = (Long)theEvent.get("cnt");
-        	if (cnt != null) {
-	        	CountsObject count = new CountsObject();
-	        	count.setCounts(cnt);
-	        	counts.addLast(count);
-	        	while (counts.size() > LIST_SIZE) {
-	        		counts.removeFirst();
+        for (EventBean theEvent : newEvents) {
+//        	log.info("count=" + theEvent.get("cnt").toString());
+	        if(theEvent != null) {
+	        	Long cnt = (Long)theEvent.get("cnt");
+	        	if (cnt != null) {
+		        	CountsObject count = new CountsObject();
+		        	count.setCounts(cnt);
+		        	counts.addLast(count);
+		        	while (counts.size() > LIST_SIZE) {
+		        		counts.removeFirst();
+		        	}
 	        	}
-        	}
+	        }
         }
     }
 

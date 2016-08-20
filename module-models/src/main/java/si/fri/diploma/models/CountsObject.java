@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-	"fifteen"
+	"counts"
 })
 public class CountsObject {
 
@@ -37,7 +37,7 @@ public class CountsObject {
 	 * @param fifteen seconds latency
 	 * The fifteen seconds latency
 	 */
-	@JsonProperty("fifteen")
+	@JsonProperty("counts")
 	public void setCounts(Long counts) {
 		this.counts = counts;
 	}

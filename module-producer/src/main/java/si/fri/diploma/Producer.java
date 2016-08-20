@@ -7,7 +7,7 @@ import com.google.common.io.Resources;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
-import si.fri.diploma.models.IoTEvent;
+import si.fri.diploma.models.SimpleEvent;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -93,14 +93,14 @@ public class Producer {
             try {
                 for (int i = 0; i < Integer.MAX_VALUE; i++) {
 //                	busyWait();
-//                	Thread.sleep(1);
+                	Thread.sleep(1);
                 	
-                	IoTEvent event = createEvent("normal", i);
+                	SimpleEvent event = createEvent("normal", i);
 //                	LOG.log(Level.INFO, mapper.writeValueAsString(event));
                 	producer.send(new ProducerRecord<String, String>("fast-messages", mapper.writeValueAsString(event)));
                     
                 	if (i % 10000 == 0) {
-                		IoTEvent markerEvent = createEvent("marker", i);
+                		SimpleEvent markerEvent = createEvent("marker", i);
                     	producer.send(new ProducerRecord<String, String>("fast-messages", mapper.writeValueAsString(markerEvent)));
                         producer.flush();
                        	LOG.log(Level.INFO, "Sent message number " + i);
@@ -121,8 +121,8 @@ public class Producer {
      * @param serialNum	serial number of the event
      * @return
      */
-    public IoTEvent createEvent(String type, Integer serialNum) {
-    	IoTEvent event = new IoTEvent();
+    public SimpleEvent createEvent(String type, Integer serialNum) {
+    	SimpleEvent event = new SimpleEvent();
     	event.setType(type);
     	event.setSerialNum(serialNum);
     	event.setTimestamp(System.currentTimeMillis());

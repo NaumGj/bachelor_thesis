@@ -1,4 +1,4 @@
-app = angular.module('IoTVisual', ['ngRoute', 'ngAnimate','ngMaterial','ngResource','IoTVisual.services'])
+app = angular.module('IoTVisual', ['ngRoute', 'ngAnimate', 'ngMaterial', 'ngResource', 'ngMessages', 'material.svgAssetsCache', 'IoTVisual.services'])
 .config(['$routeProvider', '$locationProvider',
 	function($routeProvider, $locationProvider) {
 
@@ -12,6 +12,16 @@ app = angular.module('IoTVisual', ['ngRoute', 'ngAnimate','ngMaterial','ngResour
 			templateUrl: 'counters.html',
 			controller: 'CountersCtrl',
 			controllerAs: 'counters'
+		})
+		.when('/fire', {
+			templateUrl: 'fire.html',
+			controller: 'FireCtrl',
+			controllerAs: 'fire'
+		})
+		.when('/shoplifting', {
+			templateUrl: 'shoplifting.html',
+			controller: 'ShopliftingCtrl',
+			controllerAs: 'shoplifting'
 		})
 		.otherwise({
 			redirectTo: '/'
@@ -53,39 +63,8 @@ app = angular.module('IoTVisual', ['ngRoute', 'ngAnimate','ngMaterial','ngResour
 	this.params = $routeParams;
 
 }])
-//.controller('CountersCtrl', function($routeParams, $scope, Izdelki, Test, $timeout) {
 .controller('CountersCtrl', function($scope, $interval, Counter, Latency) {
 
-	/* // Function to get the data
-	$scope.getData = function(){
-		Test.query().$promise.then(function(izdelek) {
-			$scope.salesData = izdelek;
-			console.log($scope.izdelek);
-		});
-	}
-	
-	// Function to replicate setInterval using $timeout service.
-	$scope.intervalFunction = function(){
-		$timeout(function() {
-			$scope.getData();
-			$scope.intervalFunction();
-		}, 1000)
-	};
-	
-	// Kick off the interval
-	$scope.intervalFunction(); */
-	/* $scope.salesData=[
-		{hour: 1,sales: 54},
-		{hour: 2,sales: 66},
-		{hour: 3,sales: 77},
-		{hour: 4,sales: 70},
-		{hour: 5,sales: 60},
-		{hour: 6,sales: 63},
-		{hour: 7,sales: 55},
-		{hour: 8,sales: 47},
-		{hour: 9,sales: 55},
-		{hour: 10,sales: 30}
-	]; */
 	var index = 0;
 	$scope.latencyData = [{index: index, value: 0}];
 	$scope.countData = [{index: index, value: 0}];
@@ -122,18 +101,181 @@ app = angular.module('IoTVisual', ['ngRoute', 'ngAnimate','ngMaterial','ngResour
 				$scope.latencyData.push({index: index, value: latency.ten});
 				index = index + 1;
 			});
-			/* if(latency.ten) {
-				if($scope.salesData.length > 30) {
-					$scope.salesData.shift();
-				}
-				//console.log("Pushing latency!");
-				//console.log(hour);
-				console.log($scope.salesData);
-				$scope.salesData.push({hour: hour, sales: latency.ten});
-			} */
 		});
 	}, 2000, 0);
 
+})
+.controller('FireCtrl', function($scope, $interval, $mdToast, TempEvent, SmokeEvent, Fire) {
+
+	this.name = "FireCtrl";
+
+    $scope.warningTemp = "Warning";
+	$scope.warningSmoke = "Warning";
+	$scope.toastRoomIds = [];
+	$scope.fires = [];
+    
+    $scope.sendTempEventCheck = function(){
+        if($scope.temperature == null | $scope.temperature == "") {
+            return false;
+        }
+        if ($scope.temperature.room_number == null | $scope.temperature.room_number == "") {
+            $scope.warningTemp = "Specify the room number (1 to 10).";
+            return false;
+        }
+        if ($scope.temperature.celsius_temperature == null | $scope.temperature.celsius_temperature == "") {
+            $scope.warningTemp = "Specify the temperature in Celsius degrees.";
+            return false;
+        }
+        return true;
+    }
+    $scope.sendTemperatureEvent = function(temp) {
+        var data = JSON.parse(JSON.stringify(temp));
+		data["@type"] = "temperature";
+		data["type"] = "temperature";
+		data["timestamp"] = 0;
+		data["serial_num"] = 0;
+		data["timestamp_consumed"] = 0;
+		data["sensor_id"] = 1;
+		console.log(data);
+        TempEvent.save(data, function(gla) {
+            console.log("Sent");
+        }); 
+    }
+	
+	$scope.sendSmokeEventCheck = function(){
+        if($scope.smoke == null | $scope.smoke == "") {
+            return false;
+        }
+        if ($scope.smoke.room_number == null | $scope.smoke.room_number == "") {
+            $scope.warningSmoke = "Specify the room number (1 to 10).";
+            return false;
+        }
+        if ($scope.smoke.obscuration == null | $scope.smoke.obscuration == "") {
+            $scope.warningSmoke = "Specify the obscuration in percentage of obscuration per meter.";
+            return false;
+        }
+        return true;
+    }
+    $scope.sendSmokeEvent = function(smoke) {
+        var data = JSON.parse(JSON.stringify(smoke));
+		data["@type"] = "smoke";
+		data["type"] = "smoke";
+		data["timestamp"] = 0;
+		data["serial_num"] = 0;
+		data["timestamp_consumed"] = 0;
+		data["sensor_id"] = 1;
+		console.log(data);
+        SmokeEvent.save(data, function() {
+            console.log("Sent");
+        }); 
+    }
+	
+	$interval(function(){
+		Fire.query().$promise.then(function(fires) {
+			console.log(fires);
+			var roomIds = [];
+			var uniqueFires = [];
+			for (var i=fires.length-1; i>=0; i--) {
+				console.log(roomIds);
+				console.log(uniqueFires);
+				if(roomIds.indexOf(fires[i].room_number) == -1) {
+					roomIds.push(fires[i].room_number);
+					uniqueFires.push(fires[i]);
+				}
+			}
+			$scope.fires = uniqueFires;
+		});
+	}, 500, 0);
+	
+})
+.controller('ShopliftingCtrl', function($scope, $interval, $mdToast, StolenProducts, ShelfEvent, PaidEvent, ExitEvent) {
+
+	this.name = "ShopliftingCtrl";
+	$scope.stolen = [];
+
+    $scope.sendShelfEventCheck = function(){
+        if($scope.shelf == null | $scope.shelf == "") {
+            return false;
+        }
+        if ($scope.shelf.product_id == null | $scope.shelf.product_id == "") {
+            return false;
+        }
+        return true;
+    }
+    $scope.sendShelfEvent = function(shelf) {
+        var data = JSON.parse(JSON.stringify(shelf));
+		data["@type"] = "shelf";
+		data["type"] = "shelf";
+		data["timestamp"] = 0;
+		data["serial_num"] = 0;
+		data["timestamp_consumed"] = 0;
+		console.log(data);
+        ShelfEvent.save(data, function() {
+            console.log("Sent");
+        }); 
+    }
+	
+	$scope.sendPaidEventCheck = function(){
+        if($scope.paid == null | $scope.paid == "") {
+            return false;
+        }
+        if ($scope.paid.product_id == null | $scope.paid.product_id == "") {
+            return false;
+        }
+        return true;
+    }
+    $scope.sendPaidEvent = function(paid) {
+        var data = JSON.parse(JSON.stringify(paid));
+		data["@type"] = "paid";
+		data["type"] = "paid";
+		data["timestamp"] = 0;
+		data["serial_num"] = 0;
+		data["timestamp_consumed"] = 0;
+		console.log(data);
+        PaidEvent.save(data, function() {
+            console.log("Sent");
+        }); 
+    }
+	
+	$scope.sendExitEventCheck = function(){
+        if($scope.exit == null | $scope.exit == "") {
+            return false;
+        }
+        if ($scope.exit.product_id == null | $scope.exit.product_id == "") {
+            return false;
+        }
+        return true;
+    }
+    $scope.sendExitEvent = function(exit) {
+        var data = JSON.parse(JSON.stringify(exit));
+		data["@type"] = "exit";
+		data["type"] = "exit";
+		data["timestamp"] = 0;
+		data["serial_num"] = 0;
+		data["timestamp_consumed"] = 0;
+		console.log(data);
+        ExitEvent.save(data, function() {
+            console.log("Sent");
+        }); 
+    }
+	
+	$interval(function(){
+		StolenProducts.query().$promise.then(function(stolen) {
+			console.log(stolen);
+			/* var roomIds = [];
+			var uniqueStolen = [];
+			for (var i=stolen.length-1; i>=0; i--) {
+				console.log(roomIds);
+				console.log(uniqueFires);
+				if(roomIds.indexOf(fires[i].room_number) == -1) {
+					roomIds.push(fires[i].room_number);
+					uniqueFires.push(fires[i]);
+				}
+			} */
+			$scope.stolen = stolen;
+		});
+	}, 500, 0);
+	
 })
 .directive('linearChart', function($parse, $window){
    return{
@@ -229,4 +371,24 @@ app = angular.module('IoTVisual', ['ngRoute', 'ngAnimate','ngMaterial','ngResour
 		   drawLineChart();
 	   }
    };
+});
+
+var INTEGER_REGEXP = /^\-?\d+$/;
+app.directive('integer', function() {
+  return {
+    require: 'ngModel',
+    link: function(scope, elm, attrs, ctrl) {
+      ctrl.$validators.integer = function(modelValue, viewValue) {
+        if (ctrl.$isEmpty(modelValue)) {
+          return true;
+        }
+
+        if (INTEGER_REGEXP.test(viewValue)) {
+          return true;
+        }
+
+        return false;
+      };
+    }
+  };
 });

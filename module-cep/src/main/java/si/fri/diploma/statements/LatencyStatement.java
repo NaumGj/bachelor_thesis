@@ -20,8 +20,7 @@ public class LatencyStatement {
     	statement = admin.createEPL(stmt);
     }
 
-    public void addListener(UpdateListener listener)
-    {
+    public void addListener(UpdateListener listener) {
         statement.addListener(listener);
     }
 }

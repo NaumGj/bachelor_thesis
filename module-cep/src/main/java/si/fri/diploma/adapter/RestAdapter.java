@@ -22,11 +22,20 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import si.fri.diploma.ServiceRegistry;
+import si.fri.diploma.listeners.FireDetectionListener;
 import si.fri.diploma.listeners.LatencyListener;
 import si.fri.diploma.listeners.CountListener;
-import si.fri.diploma.models.IoTEvent;
+import si.fri.diploma.listeners.ShopliftingListener;
+import si.fri.diploma.models.ExitEvent;
+import si.fri.diploma.models.PaidEvent;
+import si.fri.diploma.models.ShelfEvent;
+import si.fri.diploma.models.SimpleEvent;
+import si.fri.diploma.models.SmokeSensorEvent;
+import si.fri.diploma.models.TemperatureSensorEvent;
+import si.fri.diploma.statements.FireDetectionStatement;
 import si.fri.diploma.statements.LatencyStatement;
 import si.fri.diploma.statements.CountStatement;
+import si.fri.diploma.statements.ShopliftingStatement;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -124,9 +133,9 @@ public class RestAdapter {
     					public void completed(String answer) {
     						// on complete
 //    						LOG.log(Level.INFO, "ANSWER: " + answer);
-    						List<IoTEvent> events = null;
+    						List<SimpleEvent> events = null;
     						try {
-    							events = Arrays.asList(mapper.readValue(answer, IoTEvent[].class));
+    							events = Arrays.asList(mapper.readValue(answer, SimpleEvent[].class));
     						} catch (JsonParseException e) {
     							LOG.log(Level.WARNING, "JsonParseException in async request. Reason: " + e.getMessage());
     						} catch (JsonMappingException e) {
@@ -135,7 +144,7 @@ public class RestAdapter {
     							LOG.log(Level.WARNING, "IOException in async request. Reason: " + e.getMessage());
     						}
 //    						LOG.log(Level.INFO, "The list of events: " + events.toString());
-    						for(IoTEvent event : events) {
+    						for(SimpleEvent event : events) {
     							if("marker".equals(event.getType())) {
     								LOG.log(Level.INFO, "ID: " + event.getSerialNum());
     							}
@@ -177,7 +186,12 @@ public class RestAdapter {
     	// Configure engine with event names to make the statements more readable.
         // This could also be done in a configuration file.
         Configuration configuration = new Configuration();
-        configuration.addEventType("TestEvent", IoTEvent.class.getName());
+        configuration.addEventType("TestEvent", SimpleEvent.class.getName());
+        configuration.addEventType("TemperatureEvent", TemperatureSensorEvent.class.getName());
+        configuration.addEventType("SmokeEvent", SmokeSensorEvent.class.getName());
+        configuration.addEventType("ShelfEvent", ShelfEvent.class.getName());
+        configuration.addEventType("PaidEvent", PaidEvent.class.getName());
+        configuration.addEventType("ExitEvent", ExitEvent.class.getName());
 
         // Get engine instance
         epService = EPServiceProviderManager.getProvider("RestAdapter", configuration);
@@ -188,6 +202,12 @@ public class RestAdapter {
         
         LatencyStatement latencyStmt = new LatencyStatement(epService.getEPAdministrator());
         latencyStmt.addListener(new LatencyListener());
+        
+        FireDetectionStatement fireStmt = new FireDetectionStatement(epService.getEPAdministrator());
+        fireStmt.addListener(new FireDetectionListener());
+        
+        ShopliftingStatement shopStmt = new ShopliftingStatement(epService.getEPAdministrator());
+        shopStmt.addListener(new ShopliftingListener());
         LOG.log(Level.INFO, "Esper engine initialized");
     }
     
