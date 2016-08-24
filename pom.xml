@@ -13,7 +13,7 @@
   	<module>module-utils</module>
   	<module>module-webservices-cep</module>
   	<module>module-fire-producer</module>
-  	<module>module-webservices-producer</module>
+  	<module>module-webservices-fire-producer</module>
   	<module>module-shop-producer</module>
   	<module>module-webservices-shop-producer</module>
   </modules>

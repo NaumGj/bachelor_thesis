@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: front-end
+  labels:
+    app: front-end
+    component: visual
+spec:
+  ports:
+  - port: 8080
+    name: visual-port
+    targetPort: 8080
+    protocol: TCP
+  type: LoadBalancer
+  selector:
+    app: front-end
+    component: visual

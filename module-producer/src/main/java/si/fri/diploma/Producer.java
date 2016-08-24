@@ -70,7 +70,7 @@ public class Producer {
         runnableHandle = scheduler.schedule(runnable, 5, TimeUnit.SECONDS);
     }
     
-    private class ProductionRunnable implements Runnable{
+    private class ProductionRunnable implements Runnable {
 
         public ProductionRunnable() {}
 

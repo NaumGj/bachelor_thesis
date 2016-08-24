@@ -186,7 +186,7 @@ public class RestAdapter {
     	// Configure engine with event names to make the statements more readable.
         // This could also be done in a configuration file.
         Configuration configuration = new Configuration();
-        configuration.addEventType("TestEvent", SimpleEvent.class.getName());
+        configuration.addEventType("SimpleEvent", SimpleEvent.class.getName());
         configuration.addEventType("TemperatureEvent", TemperatureSensorEvent.class.getName());
         configuration.addEventType("SmokeEvent", SmokeSensorEvent.class.getName());
         configuration.addEventType("ShelfEvent", ShelfEvent.class.getName());

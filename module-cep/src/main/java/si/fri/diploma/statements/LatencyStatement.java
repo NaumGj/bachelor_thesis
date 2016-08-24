@@ -15,8 +15,8 @@ public class LatencyStatement {
 
 //        statement = admin.createEPL(stmt);
     	
-    	String stmt = "context CtxSeconds select avg(timestampConsumed - timestamp) as avgLatency" +
-					" from TestEvent output snapshot when terminated";
+    	String stmt = "context Ctx10Seconds select avg(timestampConsumed - timestamp) as avgLatency" +
+					" from SimpleEvent output snapshot when terminated";
     	statement = admin.createEPL(stmt);
     }
 

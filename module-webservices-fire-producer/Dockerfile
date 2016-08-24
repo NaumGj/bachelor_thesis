@@ -20,4 +20,4 @@ ENV JAVA_ENV=PRODUCTION
 
 EXPOSE 8080
 
-CMD ["java", "-server", "-cp", "module-webservices-producer/target/classes:module-webservices-producer/target/dependency/*", "com.kumuluz.ee.EeApplication"]
+CMD ["java", "-server", "-cp", "module-webservices-fire-producer/target/classes:module-webservices-fire-producer/target/dependency/*", "com.kumuluz.ee.EeApplication"]

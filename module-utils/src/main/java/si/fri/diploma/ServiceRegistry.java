@@ -33,10 +33,10 @@ public class ServiceRegistry {
     public ServiceRegistry() {
 
         try {
-            String zookeeperUri = System.getenv("ZOOKEEPER_URI");
-            System.out.println("ZOOKEEPER URI: " + zookeeperUri);
+//            String zookeeperUri = System.getenv("ZOOKEEPER_URI");
+//            System.out.println("ZOOKEEPER URI: " + zookeeperUri);
             
-            zookeeper = CuratorFrameworkFactory.newClient("10.19.251.27:2181", new RetryNTimes(5, 1000));
+            zookeeper = CuratorFrameworkFactory.newClient("10.111.245.205:2181", new RetryNTimes(5, 1000));
             
             System.out.println("Connected to ZooKeeper");
             
